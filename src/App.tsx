@@ -12,6 +12,7 @@ import { RightTelemetryPanel } from './components/RightTelemetryPanel';
 import { TerminalPanel } from './components/TerminalPanel';
 import { CommandPalette } from './components/CommandPalette';
 import { DataGovernanceModal } from './components/DataGovernanceModal';
+import { ProjectDetailModal } from './components/ProjectDetailModal';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'viewport' | 'notebook' | 'playground' | 'profile'>('viewport');
@@ -20,6 +21,7 @@ export const App: React.FC = () => {
   const [terminalOpen, setTerminalOpen] = useState<boolean>(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState<boolean>(false);
   const [governanceModalOpen, setGovernanceModalOpen] = useState<boolean>(false);
+  const [projectModalOpen, setProjectModalOpen] = useState<boolean>(false);
   const [isOverclock, setIsOverclock] = useState<boolean>(false);
 
   const [telemetry] = useState<TelemetryData>({
@@ -47,6 +49,9 @@ export const App: React.FC = () => {
 
   const handleSelectProject = (project: Project | null) => {
     setSelectedProject(project);
+    if (project) {
+      setProjectModalOpen(true);
+    }
   };
 
   const handleTriggerOverclock = () => {
@@ -117,6 +122,10 @@ export const App: React.FC = () => {
             rocAuc: telemetry.accuracy,
           }}
           isOverclock={isOverclock}
+          onExpandProject={(p) => {
+            setSelectedProject(p);
+            setProjectModalOpen(true);
+          }}
         />
       </div>
 
@@ -139,6 +148,11 @@ export const App: React.FC = () => {
       <DataGovernanceModal
         isOpen={governanceModalOpen}
         onClose={() => setGovernanceModalOpen(false)}
+      />
+
+      <ProjectDetailModal
+        project={projectModalOpen ? selectedProject : null}
+        onClose={() => setProjectModalOpen(false)}
       />
     </div>
   );

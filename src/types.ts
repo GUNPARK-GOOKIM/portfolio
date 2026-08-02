@@ -5,6 +5,11 @@ export type Project = {
   status: 'Deployed' | 'Production Ready' | 'Research Prototype';
   description: string;
   longDescription: string;
+  problem?: string;
+  architecture?: string;
+  challenges?: string[];
+  lessonsLearned?: string[];
+  timeline?: string;
   tags: string[];
   metrics: {
     accuracy?: string;

@@ -7,6 +7,7 @@ interface RightTelemetryPanelProps {
   selectedProject: Project | null;
   telemetry: { trainingEpoch: number; gpuVRAM: number; loss: number; rocAuc: number };
   isOverclock: boolean;
+  onExpandProject?: (project: Project) => void;
 }
 
 const TECH_STACK_BADGES: Record<string, { label: string; color: string }[]> = {
@@ -39,6 +40,7 @@ const TECH_STACK_BADGES: Record<string, { label: string; color: string }[]> = {
 export const RightTelemetryPanel: React.FC<RightTelemetryPanelProps> = ({
   selectedProject,
   isOverclock,
+  onExpandProject,
 }) => {
   const proj = selectedProject;
   const badges = proj ? TECH_STACK_BADGES[proj.id] || [] : [];
@@ -113,6 +115,13 @@ export const RightTelemetryPanel: React.FC<RightTelemetryPanelProps> = ({
                 </a>
               )}
             </div>
+
+            <button
+              onClick={() => { soundFx.playSuccess(); onExpandProject && onExpandProject(proj); }}
+              className="w-full flex items-center justify-center gap-1.5 py-2 bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-[11px] font-mono font-bold transition-all shadow-md mt-1"
+            >
+              <span>✨ Expand Full Project Explorer</span>
+            </button>
           </div>
 
           {/* Performance & Metrics */}
