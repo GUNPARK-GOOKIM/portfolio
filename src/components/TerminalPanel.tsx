@@ -16,8 +16,8 @@ export const TerminalPanel: React.FC<TerminalPanelProps> = ({
   onTriggerAgent,
 }) => {
   const [history, setHistory] = useState<string[]>([
-    'DATA-FLOW MATRIX Interactive Cyber REPL Shell [v3.0]',
-    'Type "help" for available commands, "agent run" for AI Agent Mode, or "overclock" for Turbo Mode.',
+    'AKSHAT LAKHERA Interactive Portfolio Shell [v3.0]',
+    'Type "help" for available commands, "overclock" for Turbo Mode, or "cat resume" for summary.',
     '--------------------------------------------------------------------------------------------------'
   ]);
   const [inputVal, setInputVal] = useState('');

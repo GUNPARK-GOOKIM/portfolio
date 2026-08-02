@@ -69,18 +69,18 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
                 ? 'from-rose-400 via-amber-400 to-red-500'
                 : 'from-cyan-400 via-blue-400 to-emerald-400'
             }`}>
-              DATA-FLOW MATRIX
+              AKSHAT LAKHERA
             </span>
             <span className={`px-1.5 py-0.5 text-[10px] font-mono rounded border ${
               isOverclock
                 ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse'
                 : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'
             }`}>
-              {isOverclock ? 'OVERCLOCK 95°C' : 'v3.0 MLOps'}
+              {isOverclock ? 'TURBO MODE' : 'PORTFOLIO OS'}
             </span>
           </div>
           <span className="text-[11px] text-slate-400 hidden sm:inline-block">
-            Cyber MLOps & Pipeline Command Center
+            Interactive 3D Solar System & Systems Workspace
           </span>
         </div>
       </div>
