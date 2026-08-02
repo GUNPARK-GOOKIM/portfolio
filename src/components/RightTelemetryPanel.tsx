@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Project } from '../types';
-import { BarChart2, Activity, ExternalLink, GitBranch, Code2, Layers, Zap, UserCheck, GraduationCap, Award } from 'lucide-react';
+import { BarChart2, Activity, ExternalLink, GitBranch, Zap, UserCheck, GraduationCap, Award } from 'lucide-react';
 import { soundFx } from '../utils/audio';
 
 interface RightTelemetryPanelProps {

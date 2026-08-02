@@ -1,4 +1,4 @@
-import { NotebookCell } from '../types';
+import type { NotebookCell } from '../types';
 
 export const initialNotebookCells: NotebookCell[] = [
   {

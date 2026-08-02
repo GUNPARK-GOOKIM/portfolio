@@ -45,7 +45,7 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleSelectProject = (project: Project) => {
+  const handleSelectProject = (project: Project | null) => {
     setSelectedProject(project);
   };
 
@@ -110,7 +110,12 @@ export const App: React.FC = () => {
 
         <RightTelemetryPanel
           selectedProject={selectedProject}
-          telemetry={telemetry}
+          telemetry={{
+            trainingEpoch: telemetry.trainingEpoch,
+            gpuVRAM: telemetry.gpuVramUsedGB,
+            loss: telemetry.currentLoss,
+            rocAuc: telemetry.accuracy,
+          }}
           isOverclock={isOverclock}
         />
       </div>

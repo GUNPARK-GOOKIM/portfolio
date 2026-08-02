@@ -307,8 +307,8 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
       const mockProject: Project = {
         id: `undiscovered-${idx}`,
         title: cfg.label,
-        category: 'Future Release',
-        status: 'In Development',
+        category: 'Deep Learning',
+        status: 'Research Prototype',
         description: 'Upcoming AI/ML & Systems engineering project currently in active research & development.',
         longDescription: `This planet represents an upcoming flagship project (${cfg.label}). Features including real-time pipeline visualization, dataset profiling, and native system bindings are currently under active development.`,
         tags: ['Upcoming', 'AI-ML', 'In-Development', 'Research'],

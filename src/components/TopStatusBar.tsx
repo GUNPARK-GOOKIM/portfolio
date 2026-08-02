@@ -1,14 +1,14 @@
 import React from 'react';
-import { Cpu, Activity, Volume2, VolumeX, Search, Download, Terminal, Layers, PlayCircle, UserCheck, Flame, Zap, ShieldCheck } from 'lucide-react';
+import { Cpu, Volume2, VolumeX, Search, Download, Terminal, Layers, UserCheck, Flame, Zap } from 'lucide-react';
 import { soundFx } from '../utils/audio';
 
 interface TopStatusBarProps {
   activeTab: 'viewport' | 'notebook' | 'playground' | 'profile';
   setActiveTab: (tab: 'viewport' | 'notebook' | 'playground' | 'profile') => void;
-  gpuLoss: number;
-  gpuVram: number;
+  gpuLoss?: number;
+  gpuVram?: number;
   onOpenCommandPalette: () => void;
-  onOpenGovernanceModal: () => void;
+  onOpenGovernanceModal?: () => void;
   isMuted: boolean;
   setIsMuted: (muted: boolean) => void;
   terminalOpen: boolean;
@@ -20,10 +20,10 @@ interface TopStatusBarProps {
 export const TopStatusBar: React.FC<TopStatusBarProps> = ({
   activeTab,
   setActiveTab,
-  gpuLoss,
-  gpuVram,
+  gpuLoss: _gpuLoss,
+  gpuVram: _gpuVram,
   onOpenCommandPalette,
-  onOpenGovernanceModal,
+  onOpenGovernanceModal: _onOpenGovernanceModal,
   isMuted,
   setIsMuted,
   terminalOpen,
