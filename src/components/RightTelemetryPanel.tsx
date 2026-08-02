@@ -29,9 +29,10 @@ const TECH_STACK_BADGES: Record<string, { label: string; color: string }[]> = {
     { label: 'Tailwind CSS', color: 'text-sky-400 border-sky-500/30 bg-sky-500/10' },
   ],
   'proj-hopper': [
-    { label: 'Python & CUDA', color: 'text-orange-400 border-orange-500/30 bg-orange-500/10' },
-    { label: 'PyTorch Deep Learning', color: 'text-rose-400 border-rose-500/30 bg-rose-500/10' },
-    { label: 'Agent Dispatcher', color: 'text-violet-400 border-violet-500/30 bg-violet-500/10' },
+    { label: 'Next.js 16 & React 19', color: 'text-cyan-400 border-cyan-500/30 bg-cyan-500/10' },
+    { label: 'Fastify 5 & Socket.IO', color: 'text-lime-400 border-lime-500/30 bg-lime-500/10' },
+    { label: 'WebRTC P2P Streams', color: 'text-violet-400 border-violet-500/30 bg-violet-500/10' },
+    { label: 'Redis & Postgres Prisma', color: 'text-orange-400 border-orange-500/30 bg-orange-500/10' },
   ],
 };
 
