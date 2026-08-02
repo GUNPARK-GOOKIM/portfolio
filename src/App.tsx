@@ -22,7 +22,7 @@ export const App: React.FC = () => {
   const [governanceModalOpen, setGovernanceModalOpen] = useState<boolean>(false);
   const [isOverclock, setIsOverclock] = useState<boolean>(false);
 
-  const [telemetry, setTelemetry] = useState<TelemetryData>({
+  const [telemetry] = useState<TelemetryData>({
     gpuVramUsedGB: 18.4,
     gpuVramTotalGB: 24.0,
     trainingEpoch: 28,

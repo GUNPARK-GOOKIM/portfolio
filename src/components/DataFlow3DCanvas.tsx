@@ -319,12 +319,20 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
           vramSavings: '80% (Quantized)',
           businessImpactMetric: 'Next-gen analytics & automated ML pipeline',
         },
+        governance: {
+          piiMasking: true,
+          differentialPrivacy: false,
+          classImbalanceMitigation: 'SMOTE',
+          complianceStandard: 'ISO/IEC 27001',
+        },
         provenance: {
           ipfsHash: 'ipfs://QmFutureProjectDev...',
           gitCommitSha: 'sha256:dev_in_progress',
           modelRegistryVersion: 'v0.1.0-alpha',
         },
+        highlights: ['Autonomous execution', 'Local vector search'],
         githubUrl: 'https://github.com/GUNPARK-GOOKIM',
+        clusterCoords: { x: 0, y: 0, z: 0 },
       };
 
       planetMesh.userData = { project: mockProject };
