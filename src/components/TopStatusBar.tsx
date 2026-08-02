@@ -100,6 +100,18 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
         </button>
 
         <button
+          onClick={() => { soundFx.playClick(); setActiveTab('notebook'); }}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+            activeTab === 'notebook'
+              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+          }`}
+        >
+          <Terminal className="w-3.5 h-3.5" />
+          <span>Code Sandbox</span>
+        </button>
+
+        <button
           onClick={() => { soundFx.playClick(); setActiveTab('profile'); }}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
             activeTab === 'profile'

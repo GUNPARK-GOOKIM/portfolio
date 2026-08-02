@@ -79,9 +79,22 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<Project | null>(selectedProject);
 
+  const [viewMode, setViewMode] = React.useState<'solar' | 'skills'>('solar');
+  const [speedMult, setSpeedMult] = React.useState<number>(1.0);
+  const [exposureVal, setExposureVal] = React.useState<number>(1.35);
+
+  const speedRef = useRef<number>(1.0);
+  const viewModeRef = useRef<'solar' | 'skills'>(viewMode);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+
+  useEffect(() => { selectedRef.current = selectedProject; }, [selectedProject]);
+  useEffect(() => { speedRef.current = speedMult; }, [speedMult]);
+  useEffect(() => { viewModeRef.current = viewMode; }, [viewMode]);
   useEffect(() => {
-    selectedRef.current = selectedProject;
-  }, [selectedProject]);
+    if (rendererRef.current) {
+      rendererRef.current.toneMappingExposure = exposureVal;
+    }
+  }, [exposureVal]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -369,6 +382,44 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
       });
     });
 
+    // ── Interactive 3D Skill Constellation ──────────────────
+    const SKILL_NODES = [
+      { name: 'Python', color: 0x38bdf8, pos: new THREE.Vector3(-4, 3, 2) },
+      { name: 'Rust', color: 0xf97316, pos: new THREE.Vector3(-2, -2, 4) },
+      { name: 'SQL & Postgres', color: 0x3b82f6, pos: new THREE.Vector3(3, 4, -1) },
+      { name: 'PyTorch / ML', color: 0xec4899, pos: new THREE.Vector3(4, -1, 3) },
+      { name: 'React & TS', color: 0x06b6d4, pos: new THREE.Vector3(1, -3, -3) },
+      { name: 'Tauri / Electron', color: 0xa855f7, pos: new THREE.Vector3(-3, 2, -4) },
+    ];
+
+    const constellationGroup = new THREE.Group();
+    const skillNodeMeshes: THREE.Mesh[] = [];
+
+    SKILL_NODES.forEach((sk) => {
+      const sGeo = new THREE.SphereGeometry(0.45, 32, 32);
+      const sMat = new THREE.MeshBasicMaterial({ color: sk.color });
+      const sMesh = new THREE.Mesh(sGeo, sMat);
+      sMesh.position.copy(sk.pos);
+      const auraGeo = new THREE.SphereGeometry(0.75, 16, 16);
+      const auraMat = new THREE.MeshBasicMaterial({
+        color: sk.color, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, side: THREE.BackSide,
+      });
+      sMesh.add(new THREE.Mesh(auraGeo, auraMat));
+      constellationGroup.add(sMesh);
+      skillNodeMeshes.push(sMesh);
+    });
+
+    // Constellation connecting beam lines
+    for (let i = 0; i < SKILL_NODES.length; i++) {
+      for (let j = i + 1; j < SKILL_NODES.length; j++) {
+        const lineGeo = new THREE.BufferGeometry().setFromPoints([SKILL_NODES[i].pos, SKILL_NODES[j].pos]);
+        const lineMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.25 });
+        constellationGroup.add(new THREE.Line(lineGeo, lineMat));
+      }
+    }
+
+    scene.add(constellationGroup);
+
     // ── Mouse & Interaction Handling ─────────────────────
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -401,6 +452,12 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
       }
     };
 
+    // Target camera position for smooth fly-to lerp
+    const defaultCamPos = new THREE.Vector3(0, 9, 23);
+    const targetCamPos = new THREE.Vector3(0, 9, 23);
+    const targetLookAt = new THREE.Vector3(0, 0, 0);
+    const currentLookAt = new THREE.Vector3(0, 0, 0);
+
     const onClick = (e: MouseEvent) => {
       // If user was dragging camera orbit, do not treat as a click
       if (isDragging) return;
@@ -423,11 +480,25 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
         const proj = hitMesh.userData?.project as Project;
         if (proj) {
           soundFx.playPulse();
-          onSelectProject(proj);
+
+          // Calculate target camera position offset from planet
+          const planetWorldPos = new THREE.Vector3();
+          hitMesh.getWorldPosition(planetWorldPos);
+
+          // Fly to position offset from planet
+          targetCamPos.copy(planetWorldPos).add(new THREE.Vector3(0, 2, 5));
+          targetLookAt.copy(planetWorldPos);
+
+          // Trigger project modal after brief fly-to camera zoom
+          setTimeout(() => {
+            onSelectProject(proj);
+          }, 350);
         }
       } else {
-        // User clicked blank space — Deselect current selection!
+        // User clicked blank space — Reset camera & deselect
         soundFx.playClick();
+        targetCamPos.copy(defaultCamPos);
+        targetLookAt.set(0, 0, 0);
         onSelectProject(null);
       }
     };
@@ -454,15 +525,26 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
       rafId = requestAnimationFrame(animate);
       t += 0.008;
 
-      // ── Clean Photorealistic Sun Animation ─────────────────────
-      sunLight.intensity = 7.5 + Math.sin(t * 2) * 0.5;
+      // Smooth Camera Fly-To Lerp
+      camera.position.lerp(targetCamPos, 0.08);
+      currentLookAt.lerp(targetLookAt, 0.08);
+      camera.lookAt(currentLookAt);
 
-      // Soft breathing solar corona halo
-      sunCorona.scale.setScalar(1.0 + Math.sin(t * 1.5) * 0.03);
+      // Toggle visibility based on View Mode
+      const isSolar = viewModeRef.current === 'solar';
+      sunGroup.visible = isSolar;
+      planetItems.forEach(p => p.group.visible = isSolar);
+      undiscoveredItems.forEach(u => u.group.visible = isSolar);
+      constellationGroup.visible = !isSolar;
 
-      // Orbit for Discovered Planets (no self-spin, texture faces the Sun at center)
+      if (!isSolar) {
+        constellationGroup.rotation.y += 0.003 * speedRef.current;
+        constellationGroup.rotation.x = Math.sin(t * 0.5) * 0.1;
+      }
+
+      // Orbit for Discovered Planets (multiplied by speedRef.current)
       planetItems.forEach((item) => {
-        item.orbitAngle += item.cfg.orbitSpeed;
+        item.orbitAngle += item.cfg.orbitSpeed * speedRef.current;
         const radius = item.cfg.orbitRadius;
 
         item.group.position.x = Math.cos(item.orbitAngle) * radius;
@@ -485,9 +567,9 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
         }
       });
 
-      // Orbit for Undiscovered Planets (face the Sun at center)
+      // Orbit for Undiscovered Planets
       undiscoveredItems.forEach((item) => {
-        item.orbitAngle += item.cfg.orbitSpeed;
+        item.orbitAngle += item.cfg.orbitSpeed * speedRef.current;
         const radius = item.cfg.orbitRadius;
 
         item.group.position.x = Math.cos(item.orbitAngle) * radius;
@@ -531,17 +613,51 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
     <div className="relative w-full h-full bg-[#020617] overflow-hidden select-none">
       <div ref={containerRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
 
-      {/* HUD Info */}
-      <div className="absolute top-4 left-4 pointer-events-none z-10">
-        <div className="bg-slate-950/80 backdrop-blur border border-slate-800 rounded-xl px-4 py-3 text-xs font-mono text-slate-200 shadow-xl">
-          <div className="flex items-center gap-2 text-cyan-400 font-bold mb-1 text-[11px]">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping inline-block" />
-            3D SOLAR SYSTEM VIEWPORT
+      {/* HUD Info & Interactive Shader Controls */}
+      <div className="absolute top-4 left-4 z-10 space-y-2">
+        <div className="bg-slate-950/90 backdrop-blur border border-slate-800 rounded-xl px-4 py-3 text-xs font-mono text-slate-200 shadow-xl">
+          <div className="flex items-center justify-between gap-3 mb-2 pb-1 border-b border-slate-800">
+            <div className="flex items-center gap-2 text-cyan-400 font-bold text-[11px]">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping inline-block" />
+              {viewMode === 'solar' ? '3D SOLAR SYSTEM VIEWPORT' : '3D SKILL CONSTELLATION'}
+            </div>
+
+            {/* View Mode Toggle Button */}
+            <button
+              onClick={() => { soundFx.playClick(); setViewMode(viewMode === 'solar' ? 'skills' : 'solar'); }}
+              className="px-2.5 py-1 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 rounded-md text-[10px] font-bold transition-all"
+            >
+              {viewMode === 'solar' ? '🌌 Switch to Skills' : '🪐 Switch to Planets'}
+            </button>
           </div>
-          <div className="text-[10px] text-slate-400 space-y-0.5">
-            <div>• Drag to rotate camera orbit</div>
-            <div>• Click any planet to inspect project</div>
-            <div>• Click empty space to deselect</div>
+
+          {/* Interactive Controls */}
+          <div className="space-y-2 text-[10px] text-slate-300 pt-1">
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-slate-400">Orbit Speed: {speedMult.toFixed(1)}x</span>
+              <input
+                type="range"
+                min="0.2"
+                max="3.0"
+                step="0.2"
+                value={speedMult}
+                onChange={(e) => setSpeedMult(parseFloat(e.target.value))}
+                className="w-24 accent-cyan-400 cursor-pointer"
+              />
+            </div>
+
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-slate-400">Sun Exposure: {exposureVal.toFixed(2)}</span>
+              <input
+                type="range"
+                min="0.8"
+                max="2.5"
+                step="0.1"
+                value={exposureVal}
+                onChange={(e) => setExposureVal(parseFloat(e.target.value))}
+                className="w-24 accent-amber-400 cursor-pointer"
+              />
+            </div>
           </div>
         </div>
       </div>

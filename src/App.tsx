@@ -5,7 +5,7 @@ import type { Project, TelemetryData } from './types';
 import { TopStatusBar } from './components/TopStatusBar';
 import { LeftSidebar } from './components/LeftSidebar';
 import { DataFlow3DCanvas } from './components/DataFlow3DCanvas';
-import { PipelineStageInspector } from './components/PipelineStageInspector';
+import { InteractiveSandbox } from './components/InteractiveSandbox';
 import { ModelPlayground } from './components/ModelPlayground';
 import { ProfileBioView } from './components/ProfileBioView';
 import { RightTelemetryPanel } from './components/RightTelemetryPanel';
@@ -101,7 +101,7 @@ export const App: React.FC = () => {
           )}
 
           {activeTab === 'notebook' && (
-            <PipelineStageInspector selectedProject={selectedProject} />
+            <InteractiveSandbox />
           )}
 
           {activeTab === 'playground' && (
