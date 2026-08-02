@@ -79,17 +79,14 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<Project | null>(selectedProject);
 
-  const [viewMode, setViewMode] = React.useState<'solar' | 'skills'>('solar');
   const [speedMult, setSpeedMult] = React.useState<number>(1.0);
   const [exposureVal, setExposureVal] = React.useState<number>(1.35);
 
   const speedRef = useRef<number>(1.0);
-  const viewModeRef = useRef<'solar' | 'skills'>(viewMode);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
 
   useEffect(() => { selectedRef.current = selectedProject; }, [selectedProject]);
   useEffect(() => { speedRef.current = speedMult; }, [speedMult]);
-  useEffect(() => { viewModeRef.current = viewMode; }, [viewMode]);
   useEffect(() => {
     if (rendererRef.current) {
       rendererRef.current.toneMappingExposure = exposureVal;
@@ -571,16 +568,8 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
           <div className="flex items-center justify-between gap-3 mb-2 pb-1 border-b border-slate-800">
             <div className="flex items-center gap-2 text-cyan-400 font-bold text-[11px]">
               <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping inline-block" />
-              {viewMode === 'solar' ? '3D SOLAR SYSTEM VIEWPORT' : '3D SKILL CONSTELLATION'}
+              3D SOLAR SYSTEM VIEWPORT
             </div>
-
-            {/* View Mode Toggle Button */}
-            <button
-              onClick={() => { soundFx.playClick(); setViewMode(viewMode === 'solar' ? 'skills' : 'solar'); }}
-              className="px-2.5 py-1 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 rounded-md text-[10px] font-bold transition-all"
-            >
-              {viewMode === 'solar' ? '🌌 Switch to Skills' : '🪐 Switch to Planets'}
-            </button>
           </div>
 
           {/* Interactive Controls */}
