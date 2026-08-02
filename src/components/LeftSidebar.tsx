@@ -203,8 +203,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       <div className="grid grid-cols-3 gap-2">
         {[
           { icon: <TrendingUp className="w-3.5 h-3.5" />, label: 'Projects', val: 4, color: 'text-cyan-400' },
-          { icon: <PieChart className="w-3.5 h-3.5" />, label: 'Commits', val: 391, color: 'text-violet-400' },
-          { icon: <Table2 className="w-3.5 h-3.5" />, label: 'Repos', val: 8, color: 'text-lime-400' },
+          { icon: <PieChart className="w-3.5 h-3.5" />, label: 'Commits', val: 30, color: 'text-violet-400' },
+          { icon: <Table2 className="w-3.5 h-3.5" />, label: 'Repos', val: 4, color: 'text-lime-400' },
         ].map(stat => (
           <div key={stat.label} className="bg-slate-900/70 border border-slate-800 rounded-xl p-2.5 flex flex-col items-center gap-1">
             <span className={stat.color}>{stat.icon}</span>

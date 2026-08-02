@@ -382,43 +382,7 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
       });
     });
 
-    // ── Interactive 3D Skill Constellation ──────────────────
-    const SKILL_NODES = [
-      { name: 'Python', color: 0x38bdf8, pos: new THREE.Vector3(-4, 3, 2) },
-      { name: 'Rust', color: 0xf97316, pos: new THREE.Vector3(-2, -2, 4) },
-      { name: 'SQL & Postgres', color: 0x3b82f6, pos: new THREE.Vector3(3, 4, -1) },
-      { name: 'PyTorch / ML', color: 0xec4899, pos: new THREE.Vector3(4, -1, 3) },
-      { name: 'React & TS', color: 0x06b6d4, pos: new THREE.Vector3(1, -3, -3) },
-      { name: 'Tauri / Electron', color: 0xa855f7, pos: new THREE.Vector3(-3, 2, -4) },
-    ];
-
-    const constellationGroup = new THREE.Group();
-    const skillNodeMeshes: THREE.Mesh[] = [];
-
-    SKILL_NODES.forEach((sk) => {
-      const sGeo = new THREE.SphereGeometry(0.45, 32, 32);
-      const sMat = new THREE.MeshBasicMaterial({ color: sk.color });
-      const sMesh = new THREE.Mesh(sGeo, sMat);
-      sMesh.position.copy(sk.pos);
-      const auraGeo = new THREE.SphereGeometry(0.75, 16, 16);
-      const auraMat = new THREE.MeshBasicMaterial({
-        color: sk.color, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, side: THREE.BackSide,
-      });
-      sMesh.add(new THREE.Mesh(auraGeo, auraMat));
-      constellationGroup.add(sMesh);
-      skillNodeMeshes.push(sMesh);
-    });
-
-    // Constellation connecting beam lines
-    for (let i = 0; i < SKILL_NODES.length; i++) {
-      for (let j = i + 1; j < SKILL_NODES.length; j++) {
-        const lineGeo = new THREE.BufferGeometry().setFromPoints([SKILL_NODES[i].pos, SKILL_NODES[j].pos]);
-        const lineMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.25 });
-        constellationGroup.add(new THREE.Line(lineGeo, lineMat));
-      }
-    }
-
-    scene.add(constellationGroup);
+    // (Cleaned up separate skill constellation group - stars integrated into background starfield & planet inspector)
 
     // ── Mouse & Interaction Handling ─────────────────────
     const raycaster = new THREE.Raycaster();
@@ -529,18 +493,6 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
       camera.position.lerp(targetCamPos, 0.08);
       currentLookAt.lerp(targetLookAt, 0.08);
       camera.lookAt(currentLookAt);
-
-      // Toggle visibility based on View Mode
-      const isSolar = viewModeRef.current === 'solar';
-      sunGroup.visible = isSolar;
-      planetItems.forEach(p => p.group.visible = isSolar);
-      undiscoveredItems.forEach(u => u.group.visible = isSolar);
-      constellationGroup.visible = !isSolar;
-
-      if (!isSolar) {
-        constellationGroup.rotation.y += 0.003 * speedRef.current;
-        constellationGroup.rotation.x = Math.sin(t * 0.5) * 0.1;
-      }
 
       // Orbit for Discovered Planets (multiplied by speedRef.current)
       planetItems.forEach((item) => {
