@@ -345,6 +345,58 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
         ))}
       </div>
 
+      {/* NEURAL NETWORK VIEWPORT / Active Training Loss Overlay */}
+      <div className="absolute bottom-4 left-4 z-10 pointer-events-none hidden md:block w-72">
+        <div className="bg-slate-950/90 backdrop-blur border border-slate-800/80 rounded-2xl p-3.5 shadow-2xl space-y-2">
+          <div className="flex items-center justify-between text-[11px] font-mono">
+            <span className="text-cyan-400 font-bold flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping inline-block" />
+              NEURAL NETWORK VIEWPORT
+            </span>
+            <span className="text-slate-500 text-[9px]">•••</span>
+          </div>
+
+          <div className="text-[10px] text-slate-400 font-mono">Active Training Loss</div>
+
+          {/* SVG Loss Line Chart & Neural Nodes Diagram */}
+          <div className="flex items-center gap-3 pt-1">
+            <div className="flex-1 h-16 bg-slate-900/80 rounded-xl p-1.5 border border-slate-800/60 relative overflow-hidden">
+              <svg className="w-full h-full overflow-visible" viewBox="0 0 100 40">
+                <path
+                  d="M0,35 Q10,20 20,28 T40,12 T60,24 T80,8 T100,18"
+                  fill="none"
+                  stroke="#a855f7"
+                  strokeWidth="2"
+                />
+                <path
+                  d="M0,30 Q15,38 30,22 T60,18 T90,28 T100,10"
+                  fill="none"
+                  stroke="#38bdf8"
+                  strokeWidth="1.5"
+                  strokeDasharray="2 2"
+                />
+              </svg>
+            </div>
+
+            {/* Neural Net Nodes Graphic */}
+            <div className="flex items-center gap-2">
+              <div className="space-y-1.5">
+                <div className="w-2.5 h-2.5 rounded-full border border-purple-400 bg-purple-500/20" />
+                <div className="w-2.5 h-2.5 rounded-full border border-purple-400 bg-purple-500/20" />
+                <div className="w-2.5 h-2.5 rounded-full border border-purple-400 bg-purple-500/20" />
+              </div>
+              <div className="space-y-1.5">
+                <div className="w-2.5 h-2.5 rounded-full border border-cyan-400 bg-cyan-500/20" />
+                <div className="w-2.5 h-2.5 rounded-full border border-cyan-400 bg-cyan-500/20" />
+              </div>
+              <div className="space-y-1.5">
+                <div className="w-2.5 h-2.5 rounded-full border border-amber-400 bg-amber-500/20" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Bottom Status Bar */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none z-10">
         <div className="bg-slate-950/90 backdrop-blur border border-slate-800 rounded-full px-5 py-1.5 text-[10px] flex items-center gap-3 shadow-xl">

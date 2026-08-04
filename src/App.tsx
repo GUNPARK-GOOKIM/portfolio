@@ -13,10 +13,12 @@ import { TerminalPanel } from './components/TerminalPanel';
 import { CommandPalette } from './components/CommandPalette';
 import { DataGovernanceModal } from './components/DataGovernanceModal';
 import { ProjectDetailModal } from './components/ProjectDetailModal';
+import { TerminalLandingGate } from './components/TerminalLandingGate';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'viewport' | 'notebook' | 'playground' | 'profile'>('viewport');
   const [selectedProject, setSelectedProject] = useState<Project | null>(projectsData[0]);
+  const [showLandingGate, setShowLandingGate] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [terminalOpen, setTerminalOpen] = useState<boolean>(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState<boolean>(false);
@@ -61,6 +63,10 @@ export const App: React.FC = () => {
   const handleTriggerAgent = () => {
     setActiveTab('notebook');
   };
+
+  if (showLandingGate) {
+    return <TerminalLandingGate onEnterDashboard={() => setShowLandingGate(false)} />;
+  }
 
   return (
     <div className={`w-screen h-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden font-sans ${
