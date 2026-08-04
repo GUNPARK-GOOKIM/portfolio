@@ -1,5 +1,5 @@
 import React from 'react';
-import { Cpu, Volume2, VolumeX, Search, Download, Terminal, Layers, UserCheck, Flame, Zap } from 'lucide-react';
+import { Cpu, Search, Download, Flame, Zap } from 'lucide-react';
 import { soundFx } from '../utils/audio';
 
 interface TopStatusBarProps {
@@ -18,23 +18,19 @@ interface TopStatusBarProps {
 }
 
 export const TopStatusBar: React.FC<TopStatusBarProps> = ({
-  activeTab,
-  setActiveTab,
+  activeTab: _activeTab,
+  setActiveTab: _setActiveTab,
   gpuLoss: _gpuLoss,
   gpuVram: _gpuVram,
   onOpenCommandPalette,
   onOpenGovernanceModal: _onOpenGovernanceModal,
-  isMuted,
-  setIsMuted,
-  terminalOpen,
-  setTerminalOpen,
+  isMuted: _isMuted,
+  setIsMuted: _setIsMuted,
+  terminalOpen: _terminalOpen,
+  setTerminalOpen: _setTerminalOpen,
   isOverclock,
   setIsOverclock,
 }) => {
-  const handleToggleSound = () => {
-    const muted = soundFx.toggleMute();
-    setIsMuted(muted);
-  };
 
   const handleToggleOverclock = () => {
     soundFx.playOverclockBeep();
@@ -64,64 +60,42 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <span className={`font-mono font-bold tracking-wider text-sm bg-gradient-to-r bg-clip-text text-transparent ${
-              isOverclock
-                ? 'from-rose-400 via-amber-400 to-red-500'
-                : 'from-cyan-400 via-blue-400 to-emerald-400'
-            }`}>
+            <span className="font-mono font-bold tracking-wider text-sm text-slate-100">
               ML Intelligence Portfolio Dashboard
             </span>
-            <span className={`px-1.5 py-0.5 text-[10px] font-mono rounded border ${
-              isOverclock
-                ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse'
-                : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'
-            }`}>
-              {isOverclock ? 'TURBO MODE' : 'v3.0 ML/Data'}
-            </span>
           </div>
-          <span className="text-[11px] text-slate-400 hidden sm:inline-block">
-            Akshat Lakhera // High-Dimensional Vector & Systems Workspace
-          </span>
         </div>
       </div>
 
-      {/* Center Workbench Tabs */}
-      <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-800">
-        <button
-          onClick={() => { soundFx.playClick(); setActiveTab('viewport'); }}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-            activeTab === 'viewport'
-              ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-          }`}
-        >
-          <Layers className="w-3.5 h-3.5" />
-          <span>3D Latent Space Map</span>
-        </button>
+      {/* Hardware Telemetry Pills matching reference image: CPU 27%, RAM 200GB, Network 1.3TB/s */}
+      <div className="hidden lg:flex items-center gap-3 font-mono text-[11px] bg-slate-900/90 border border-slate-800/80 px-3 py-1.5 rounded-xl">
+        <div className="flex items-center gap-1.5">
+          <span className="text-slate-400">⚙ CPU</span>
+          <span className="text-cyan-400 font-bold">27%</span>
+          <div className="w-10 bg-slate-800 h-1.5 rounded-full overflow-hidden">
+            <div className="bg-cyan-400 h-full w-[27%]" />
+          </div>
+        </div>
 
-        <button
-          onClick={() => { soundFx.playClick(); setActiveTab('notebook'); }}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-            activeTab === 'notebook'
-              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-          }`}
-        >
-          <Terminal className="w-3.5 h-3.5" />
-          <span>Code Sandbox</span>
-        </button>
+        <span className="text-slate-700">|</span>
 
-        <button
-          onClick={() => { soundFx.playClick(); setActiveTab('profile'); }}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-            activeTab === 'profile'
-              ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-          }`}
-        >
-          <UserCheck className="w-3.5 h-3.5" />
-          <span>Bio & Resume</span>
-        </button>
+        <div className="flex items-center gap-1.5">
+          <span className="text-slate-400">📊 RAM</span>
+          <span className="text-purple-400 font-bold">200 GB</span>
+          <div className="w-10 bg-slate-800 h-1.5 rounded-full overflow-hidden">
+            <div className="bg-purple-400 h-full w-[65%]" />
+          </div>
+        </div>
+
+        <span className="text-slate-700">|</span>
+
+        <div className="flex items-center gap-1.5">
+          <span className="text-slate-400">🌐 Network</span>
+          <span className="text-emerald-400 font-bold">1.3TB/s</span>
+          <div className="w-10 bg-slate-800 h-1.5 rounded-full overflow-hidden">
+            <div className="bg-emerald-400 h-full w-[85%]" />
+          </div>
+        </div>
       </div>
 
       {/* Right Telemetry & Action Buttons */}
@@ -151,34 +125,12 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
           <kbd className="hidden lg:inline-block px-1.5 py-0.5 text-[10px] bg-slate-800 text-slate-400 rounded">Ctrl+K</kbd>
         </button>
 
-        {/* Audio Toggle */}
-        <button
-          onClick={handleToggleSound}
-          className="p-1.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-colors"
-          title={isMuted ? 'Unmute Sound FX' : 'Mute Sound FX'}
-        >
-          {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-cyan-400" />}
-        </button>
-
-        {/* Terminal Toggle */}
-        <button
-          onClick={() => { soundFx.playClick(); setTerminalOpen(!terminalOpen); }}
-          className={`p-1.5 rounded border transition-colors ${
-            terminalOpen
-              ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
-              : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'
-          }`}
-          title="Toggle REPL Terminal"
-        >
-          <Terminal className="w-4 h-4" />
-        </button>
-
-        {/* Executive Resume PDF Download (Enterprise Recruiter Anchor Button) */}
+        {/* Executive Resume Download Button matching reference image */}
         <a
           href="/Akshat_Lakhera_Resume.docx"
           download="Akshat_Lakhera_Resume.docx"
           onClick={() => soundFx.playSuccess()}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-xs rounded-lg shadow-md shadow-cyan-500/25 transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-mono text-xs rounded-lg transition-all"
         >
           <Download className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Download Resume</span>

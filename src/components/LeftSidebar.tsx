@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Project, Skill } from '../types';
-import { BarChart2, Table2, Database, Search, Download, TrendingUp, PieChart } from 'lucide-react';
+import { Table2, Database, Search, Download, TrendingUp, PieChart } from 'lucide-react';
 import { soundFx } from '../utils/audio';
 
 interface LeftSidebarProps {
@@ -26,18 +26,6 @@ const AnimatedCount: React.FC<{ target: number; suffix?: string; prefix?: string
   }, [target]);
   return <span>{prefix}{val.toLocaleString()}{suffix}</span>;
 };
-
-// Skill categories for a data analyst
-const DATA_STACK = [
-  { name: 'Python', icon: '🐍', pct: 90, color: 'from-yellow-500 to-amber-400' },
-  { name: 'SQL', icon: '🗃️', pct: 85, color: 'from-cyan-500 to-blue-400' },
-  { name: 'Pandas', icon: '📊', pct: 88, color: 'from-lime-500 to-emerald-400' },
-  { name: 'NumPy', icon: '🔢', pct: 82, color: 'from-orange-500 to-amber-400' },
-  { name: 'Matplotlib', icon: '📈', pct: 78, color: 'from-purple-500 to-violet-400' },
-  { name: 'Scikit-Learn', icon: '🤖', pct: 75, color: 'from-rose-500 to-pink-400' },
-  { name: 'Rust / Tauri', icon: '⚙️', pct: 70, color: 'from-orange-600 to-red-400' },
-  { name: 'TypeScript', icon: '💙', pct: 80, color: 'from-blue-500 to-sky-400' },
-];
 
 // Mini EDA stats that cycle
 const EDA_QUERIES = [
@@ -175,36 +163,12 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         </div>
       </div>
 
-      {/* ── Data Stack Proficiency ──────────────────────── */}
-      <div>
-        <div className="flex items-center gap-1.5 mb-2.5 px-0.5">
-          <BarChart2 className="w-3.5 h-3.5 text-cyan-400" />
-          <span className="font-mono text-[11px] font-bold text-slate-400 uppercase tracking-wider">Data Stack</span>
-        </div>
-
-        <div className="space-y-2">
-          {DATA_STACK.map((skill) => (
-            <div key={skill.name} className="flex items-center gap-2">
-              <span className="text-[11px] w-6 text-center">{skill.icon}</span>
-              <span className="font-mono text-[11px] text-slate-300 w-20 flex-shrink-0">{skill.name}</span>
-              <div className="flex-1 bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                <div
-                  className={`bg-gradient-to-r ${skill.color} h-full rounded-full transition-all duration-1000`}
-                  style={{ width: `${skill.pct}%` }}
-                />
-              </div>
-              <span className="font-mono text-[10px] text-slate-500 w-6 text-right">{skill.pct}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* ── Quick Stats ─────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-2">
         {[
-          { icon: <TrendingUp className="w-3.5 h-3.5" />, label: 'Projects', val: 4, color: 'text-cyan-400' },
-          { icon: <PieChart className="w-3.5 h-3.5" />, label: 'Commits', val: 30, color: 'text-violet-400' },
-          { icon: <Table2 className="w-3.5 h-3.5" />, label: 'Repos', val: 4, color: 'text-lime-400' },
+          { icon: <TrendingUp className="w-3.5 h-3.5" />, label: 'Projects', val: 5, color: 'text-cyan-400' },
+          { icon: <PieChart className="w-3.5 h-3.5" />, label: 'Commits', val: 37, color: 'text-violet-400' },
+          { icon: <Table2 className="w-3.5 h-3.5" />, label: 'Repos', val: 5, color: 'text-lime-400' },
         ].map(stat => (
           <div key={stat.label} className="bg-slate-900/70 border border-slate-800 rounded-xl p-2.5 flex flex-col items-center gap-1">
             <span className={stat.color}>{stat.icon}</span>

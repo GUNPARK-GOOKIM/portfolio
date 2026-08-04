@@ -17,7 +17,7 @@ export const bioData = {
       year: '2024 - Present',
       highlights: [
         'Specialization in Artificial Intelligence & Machine Learning (CSE AI-ML)',
-        'Active Open Source Contributor — DevDash, OpenOnyx, Keystroke Lab, Hopper v2',
+        'Active Open Source Contributor — DevDash, OpenOnyx, Keystroke Lab, Hopper v2, DEEPFAKE',
         'Systems Development in Rust, Tauri 2.0, Python, and TypeScript'
       ]
     }
