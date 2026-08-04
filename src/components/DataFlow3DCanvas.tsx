@@ -10,64 +10,35 @@ interface DataFlow3DCanvasProps {
   gpuLoss: number;
 }
 
-const PLANET_CONFIGS = [
+// 4 Latent Space Project Cluster Nodes matching design reference
+const CLUSTER_NODES = [
   {
     id: 'proj-devdash',
-    textureUrl: '/planet_devdash.png',
-    label: '⚡ DevDash',
-    size: 1.1,
-    orbitRadius: 6.0,
-    orbitSpeed: 0.0025,
-    hasSaturnRing: false,
-    ringColor: 0xff6a00,
+    label: 'DevDash: Native DB Platform',
+    color: 0x38bdf8, // Cyan glow
+    pos: new THREE.Vector3(-6, 3, 2),
+    particleCount: 750,
   },
   {
     id: 'proj-openonyx',
-    textureUrl: '/planet_openonyx.png',
-    label: '💎 OpenOnyx',
-    size: 0.95,
-    orbitRadius: 8.5,
-    orbitSpeed: 0.0018,
-    hasSaturnRing: false,
-    ringColor: 0x4fc3f7,
+    label: 'OpenOnyx: Local AI Workspace',
+    color: 0xa855f7, // Purple glow
+    pos: new THREE.Vector3(6, 4, -2),
+    particleCount: 700,
   },
   {
     id: 'proj-keystrokelab',
-    textureUrl: '/planet_keystroke.png',
-    label: '🧪 Keystroke Lab',
-    size: 1.2,
-    orbitRadius: 11.0,
-    orbitSpeed: 0.0013,
-    hasSaturnRing: true,
-    ringColor: 0xdaa520,
-    ringScale: 2.2,
+    label: 'Keystroke Lab: High-Perf Engine',
+    color: 0xec4899, // Pink glow
+    pos: new THREE.Vector3(-4, -4, 3),
+    particleCount: 650,
   },
   {
     id: 'proj-hopper',
-    textureUrl: '/planet_hopper.png',
-    label: '🚀 Hopper v2',
-    size: 1.0,
-    orbitRadius: 13.5,
-    orbitSpeed: 0.0009,
-    hasSaturnRing: false,
-    ringColor: 0x00e676,
-  },
-];
-
-const UNDISCOVERED_PLANETS = [
-  {
-    label: '??? Deep Learning Pipeline',
-    orbitRadius: 16.0,
-    orbitSpeed: 0.0007,
-    size: 0.85,
-    color: 0x6366f1,
-  },
-  {
-    label: '??? Autonomous Vision Agent',
-    orbitRadius: 18.5,
-    orbitSpeed: 0.0005,
-    size: 0.75,
-    color: 0xa855f7,
+    label: 'Hopper v2: Student Agent Platform',
+    color: 0x06b6d4, // Cyan-Teal glow
+    pos: new THREE.Vector3(5, -3, -1),
+    particleCount: 600,
   },
 ];
 
@@ -79,19 +50,9 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<Project | null>(selectedProject);
 
-  const [speedMult, setSpeedMult] = React.useState<number>(1.0);
-  const [exposureVal, setExposureVal] = React.useState<number>(1.35);
-
-  const speedRef = useRef<number>(1.0);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-
-  useEffect(() => { selectedRef.current = selectedProject; }, [selectedProject]);
-  useEffect(() => { speedRef.current = speedMult; }, [speedMult]);
   useEffect(() => {
-    if (rendererRef.current) {
-      rendererRef.current.toneMappingExposure = exposureVal;
-    }
-  }, [exposureVal]);
+    selectedRef.current = selectedProject;
+  }, [selectedProject]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -101,292 +62,135 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
 
     // ── Scene Setup ─────────────────────────────────────
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x020617);
-    scene.fog = new THREE.FogExp2(0x020617, 0.01);
+    scene.background = new THREE.Color(0x030712); // Deep dark slate grid background
 
-    const camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 1000);
-    camera.position.set(0, 9, 23);
+    const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000);
+    camera.position.set(0, 0, 24);
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setSize(W, H);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35;
+    renderer.toneMappingExposure = 1.4;
     container.appendChild(renderer.domElement);
 
-    // ── Lighting System ──────────────────────────────────
-    // Ambient light so shadows are soft darks, not pitch black
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+    // ── 3D Grid & Latent Space Bounding Box ───────────────────
+    const boxGeo = new THREE.BoxGeometry(22, 14, 14);
+    const boxWireMat = new THREE.MeshBasicMaterial({
+      color: 0x1e293b,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.35,
+    });
+    const boundingBoxMesh = new THREE.Mesh(boxGeo, boxWireMat);
+    scene.add(boundingBoxMesh);
+
+    // Grid Floor
+    const gridHelper = new THREE.GridHelper(30, 20, 0x1e293b, 0x0f172a);
+    gridHelper.position.y = -7;
+    scene.add(gridHelper);
+
+    // Ambient Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
 
-    // Primary Sun PointLight at center (0,0,0)
-    const sunLight = new THREE.PointLight(0xfffae6, 8.0, 100, 0.8);
-    sunLight.position.set(0, 0, 0);
-    scene.add(sunLight);
+    // ── Cluster Nodes & Particle Swarms ───────────────────────
+    const clusterMeshes: THREE.Mesh[] = [];
+    const connectionLines: THREE.Line[] = [];
 
-    // Soft orbital rim light
-    const rimLight = new THREE.DirectionalLight(0x38bdf8, 1.2);
-    rimLight.position.set(-15, 12, 10);
-    scene.add(rimLight);
+    CLUSTER_NODES.forEach((node) => {
+      const proj = projects.find((p) => p.id === node.id) || projects[0];
 
-    // ── Deep Starfield Background ────────────────────────
-    const starCount = 2500;
-    const starGeo = new THREE.BufferGeometry();
-    const starPos = new Float32Array(starCount * 3);
-    const starCols = new Float32Array(starCount * 3);
-    for (let i = 0; i < starCount; i++) {
-      const r = 90 + Math.random() * 300;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      starPos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      starPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      starPos[i * 3 + 2] = r * Math.cos(phi);
+      // Central glowing core sphere
+      const sphereGeo = new THREE.SphereGeometry(0.7, 32, 32);
+      const sphereMat = new THREE.MeshBasicMaterial({
+        color: node.color,
+      });
+      const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+      sphereMesh.position.copy(node.pos);
+      sphereMesh.userData = { project: proj, nodeData: node };
 
-      const randColor = Math.random();
-      if (randColor > 0.8) {
-        starCols[i * 3] = 0.3; starCols[i * 3 + 1] = 0.8; starCols[i * 3 + 2] = 1.0;
-      } else if (randColor > 0.6) {
-        starCols[i * 3] = 1.0; starCols[i * 3 + 1] = 0.9; starCols[i * 3 + 2] = 0.5;
-      } else {
-        starCols[i * 3] = 1.0; starCols[i * 3 + 1] = 1.0; starCols[i * 3 + 2] = 1.0;
+      // Outer aura halo
+      const auraGeo = new THREE.SphereGeometry(1.2, 16, 16);
+      const auraMat = new THREE.MeshBasicMaterial({
+        color: node.color,
+        transparent: true,
+        opacity: 0.35,
+        blending: THREE.AdditiveBlending,
+        side: THREE.BackSide,
+      });
+      sphereMesh.add(new THREE.Mesh(auraGeo, auraMat));
+
+      scene.add(sphereMesh);
+      clusterMeshes.push(sphereMesh);
+
+      // Particle Cloud Swarm around node
+      const pGeo = new THREE.BufferGeometry();
+      const pPos = new Float32Array(node.particleCount * 3);
+      for (let i = 0; i < node.particleCount; i++) {
+        const u = Math.random();
+        const v = Math.random();
+        const theta = u * 2.0 * Math.PI;
+        const phi = Math.acos(2.0 * v - 1.0);
+        const r = 0.8 + Math.pow(Math.random(), 2) * 2.2;
+
+        pPos[i * 3] = node.pos.x + r * Math.sin(phi) * Math.cos(theta);
+        pPos[i * 3 + 1] = node.pos.y + r * Math.sin(phi) * Math.sin(theta);
+        pPos[i * 3 + 2] = node.pos.z + r * Math.cos(phi);
+      }
+      pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+
+      const pMat = new THREE.PointsMaterial({
+        color: node.color,
+        size: 0.08,
+        transparent: true,
+        opacity: 0.75,
+        blending: THREE.AdditiveBlending,
+      });
+      const pSystem = new THREE.Points(pGeo, pMat);
+      scene.add(pSystem);
+    });
+
+    // ── Inter-Cluster Synaptic Neural Beam Lines ─────────────────
+    for (let i = 0; i < CLUSTER_NODES.length; i++) {
+      for (let j = i + 1; j < CLUSTER_NODES.length; j++) {
+        const p1 = CLUSTER_NODES[i].pos;
+        const p2 = CLUSTER_NODES[j].pos;
+
+        // Curved line via QuadraticBezierCurve3
+        const midPoint = new THREE.Vector3()
+          .addVectors(p1, p2)
+          .multiplyScalar(0.5)
+          .add(new THREE.Vector3((Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4));
+
+        const curve = new THREE.QuadraticBezierCurve3(p1, midPoint, p2);
+        const points = curve.getPoints(30);
+        const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+
+        const lineMat = new THREE.LineBasicMaterial({
+          color: 0x818cf8,
+          transparent: true,
+          opacity: 0.4,
+          blending: THREE.AdditiveBlending,
+        });
+
+        const line = new THREE.Line(lineGeo, lineMat);
+        scene.add(line);
+        connectionLines.push(line);
       }
     }
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-    starGeo.setAttribute('color', new THREE.BufferAttribute(starCols, 3));
-    const starMat = new THREE.PointsMaterial({
-      size: 0.5,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.85,
-    });
-    scene.add(new THREE.Points(starGeo, starMat));
 
-    // ── Sun (Photorealistic Solar Star) ────────────────
-    const textureLoader = new THREE.TextureLoader();
-    const sunGroup = new THREE.Group();
-    scene.add(sunGroup);
-
-    // 1. Core Sun Mesh with 4K Photorealistic Solar Turbulence Map
-    const sunGeo = new THREE.SphereGeometry(1.75, 64, 64);
-    const sunTex = textureLoader.load('/sun.png');
-    sunTex.colorSpace = THREE.SRGBColorSpace;
-    const sunMat = new THREE.MeshBasicMaterial({ map: sunTex });
-    const sun = new THREE.Mesh(sunGeo, sunMat);
-    sunGroup.add(sun);
-
-    // 2. Volumetric Solar Corona Atmosphere (Smooth Additive Glow)
-    const sunCoronaGeo = new THREE.SphereGeometry(2.15, 32, 32);
-    const sunCoronaMat = new THREE.MeshBasicMaterial({
-      color: 0xfbbf24,
-      transparent: true,
-      opacity: 0.22,
-      side: THREE.BackSide,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    const sunCorona = new THREE.Mesh(sunCoronaGeo, sunCoronaMat);
-    sunGroup.add(sunCorona);
-
-    // ── Clean Thin Orbit Line Paths ──────────────────────
-    [...PLANET_CONFIGS, ...UNDISCOVERED_PLANETS].forEach((cfg) => {
-      const points: THREE.Vector3[] = [];
-      const segments = 128;
-      for (let i = 0; i <= segments; i++) {
-        const theta = (i / segments) * Math.PI * 2;
-        points.push(new THREE.Vector3(Math.cos(theta) * cfg.orbitRadius, 0, Math.sin(theta) * cfg.orbitRadius));
-      }
-      const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
-      const lineMat = new THREE.LineBasicMaterial({
-        color: 0x334155,
-        transparent: true,
-        opacity: 0.4,
-      });
-      scene.add(new THREE.LineLoop(lineGeo, lineMat));
-    });
-
-    // ── Discovered Project Planets ───────────────────────
-    type PlanetItem = {
-      group: THREE.Group;
-      mesh: THREE.Mesh;
-      selectionRing: THREE.Mesh;
-      saturnRing?: THREE.Mesh;
-      orbitAngle: number;
-      cfg: typeof PLANET_CONFIGS[0];
-      project: Project;
-    };
-
-    const planetItems: PlanetItem[] = [];
-
-    PLANET_CONFIGS.forEach((cfg, idx) => {
-      const proj = projects.find((p) => p.id === cfg.id) || projects[idx];
-      if (!proj) return;
-
-      const group = new THREE.Group();
-      const angle = (idx / PLANET_CONFIGS.length) * Math.PI * 2;
-
-      // Fully lit planet mesh with texture map (MeshBasicMaterial eliminates all dark sides/shadows)
-      const sphereGeo = new THREE.SphereGeometry(cfg.size, 64, 64);
-      const planetTex = textureLoader.load(cfg.textureUrl);
-      planetTex.colorSpace = THREE.SRGBColorSpace;
-
-      const sphereMat = new THREE.MeshBasicMaterial({
-        map: planetTex,
-      });
-
-      const planetMesh = new THREE.Mesh(sphereGeo, sphereMat);
-      planetMesh.userData = { project: proj };
-      group.add(planetMesh);
-
-      // Clean single-line Selection Ring (hidden until selected or hovered)
-      const selRingGeo = new THREE.RingGeometry(cfg.size * 1.45, cfg.size * 1.55, 64);
-      const selRingMat = new THREE.MeshBasicMaterial({
-        color: 0x38bdf8,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0,
-        blending: THREE.AdditiveBlending,
-      });
-      const selectionRing = new THREE.Mesh(selRingGeo, selRingMat);
-      selectionRing.rotation.x = Math.PI / 2;
-      group.add(selectionRing);
-
-      // Single crisp Saturn ring for Keystroke Lab
-      let saturnRing: THREE.Mesh | undefined;
-      if (cfg.hasSaturnRing && cfg.ringScale) {
-        const ringGeo = new THREE.RingGeometry(cfg.size * 1.35, cfg.size * cfg.ringScale, 64);
-        const ringMat = new THREE.MeshBasicMaterial({
-          color: cfg.ringColor,
-          side: THREE.DoubleSide,
-          transparent: true,
-          opacity: 0.65,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-        });
-        saturnRing = new THREE.Mesh(ringGeo, ringMat);
-        saturnRing.rotation.x = Math.PI / 2.5;
-        group.add(saturnRing);
-      }
-
-      group.position.set(
-        Math.cos(angle) * cfg.orbitRadius,
-        Math.sin(idx * 0.8) * 0.4,
-        Math.sin(angle) * cfg.orbitRadius
-      );
-
-      scene.add(group);
-
-      planetItems.push({
-        group,
-        mesh: planetMesh,
-        selectionRing,
-        saturnRing,
-        orbitAngle: angle,
-        cfg,
-        project: proj,
-      });
-    });
-
-    // ── Undiscovered Planets (Clickable to show in right panel) ──
-    type UndiscoveredItem = {
-      group: THREE.Group;
-      mesh: THREE.Mesh;
-      selectionRing: THREE.Mesh;
-      orbitAngle: number;
-      cfg: typeof UNDISCOVERED_PLANETS[0];
-      projectMock: Project;
-    };
-
-    const undiscoveredItems: UndiscoveredItem[] = [];
-
-    UNDISCOVERED_PLANETS.forEach((cfg, idx) => {
-      const group = new THREE.Group();
-      const angle = Math.PI * (idx + 1) * 0.85;
-
-      const sphereGeo = new THREE.SphereGeometry(cfg.size, 48, 48);
-      const sphereMat = new THREE.MeshStandardMaterial({
-        color: cfg.color,
-        roughness: 0.5,
-        metalness: 0.2,
-        emissive: new THREE.Color(cfg.color),
-        emissiveIntensity: 0.35,
-      });
-      const planetMesh = new THREE.Mesh(sphereGeo, sphereMat);
-
-      // Create a mock project for the undiscovered planet so clicking it works properly
-      const mockProject: Project = {
-        id: `undiscovered-${idx}`,
-        title: cfg.label,
-        category: 'Deep Learning',
-        status: 'Research Prototype',
-        description: 'Upcoming AI/ML & Systems engineering project currently in active research & development.',
-        longDescription: `This planet represents an upcoming flagship project (${cfg.label}). Features including real-time pipeline visualization, dataset profiling, and native system bindings are currently under active development.`,
-        tags: ['Upcoming', 'AI-ML', 'In-Development', 'Research'],
-        metrics: {
-          accuracy: 'Target 99%+',
-          latency: '< 5ms',
-          costPer1kInference: '$0.00 (Local)',
-          vramSavings: '80% (Quantized)',
-          businessImpactMetric: 'Next-gen analytics & automated ML pipeline',
-        },
-        governance: {
-          piiMasking: true,
-          differentialPrivacy: false,
-          classImbalanceMitigation: 'SMOTE',
-          complianceStandard: 'ISO/IEC 27001',
-        },
-        provenance: {
-          ipfsHash: 'ipfs://QmFutureProjectDev...',
-          gitCommitSha: 'sha256:dev_in_progress',
-          modelRegistryVersion: 'v0.1.0-alpha',
-        },
-        highlights: ['Autonomous execution', 'Local vector search'],
-        githubUrl: 'https://github.com/GUNPARK-GOOKIM',
-        clusterCoords: { x: 0, y: 0, z: 0 },
-      };
-
-      planetMesh.userData = { project: mockProject };
-      group.add(planetMesh);
-
-      // Pulse ring for undiscovered planet
-      const ringGeo = new THREE.RingGeometry(cfg.size * 1.3, cfg.size * 1.4, 48);
-      const ringMat = new THREE.MeshBasicMaterial({
-        color: cfg.color,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0.4,
-        blending: THREE.AdditiveBlending,
-      });
-      const selectionRing = new THREE.Mesh(ringGeo, ringMat);
-      selectionRing.rotation.x = Math.PI / 2;
-      group.add(selectionRing);
-
-      group.position.set(
-        Math.cos(angle) * cfg.orbitRadius,
-        Math.sin(idx * 1.1) * 0.3,
-        Math.sin(angle) * cfg.orbitRadius
-      );
-
-      scene.add(group);
-
-      undiscoveredItems.push({
-        group,
-        mesh: planetMesh,
-        selectionRing,
-        orbitAngle: angle,
-        cfg,
-        projectMock: mockProject,
-      });
-    });
-
-    // (Cleaned up separate skill constellation group - stars integrated into background starfield & planet inspector)
-
-    // ── Mouse & Interaction Handling ─────────────────────
+    // ── Raycasting & Mouse Interactivity ──────────────────────
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let isDragging = false;
     let mouseDownPos = { x: 0, y: 0 };
     let prevMousePos = { x: 0, y: 0 };
+
+    const targetCamPos = new THREE.Vector3(0, 0, 24);
+    const targetLookAt = new THREE.Vector3(0, 0, 0);
+    const currentLookAt = new THREE.Vector3(0, 0, 0);
 
     const onMouseDown = (e: MouseEvent) => {
       isDragging = false;
@@ -413,14 +217,7 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
       }
     };
 
-    // Target camera position for smooth fly-to lerp
-    const defaultCamPos = new THREE.Vector3(0, 9, 23);
-    const targetCamPos = new THREE.Vector3(0, 9, 23);
-    const targetLookAt = new THREE.Vector3(0, 0, 0);
-    const currentLookAt = new THREE.Vector3(0, 0, 0);
-
     const onClick = (e: MouseEvent) => {
-      // If user was dragging camera orbit, do not treat as a click
       if (isDragging) return;
 
       const rect = container.getBoundingClientRect();
@@ -428,13 +225,7 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
       mouse.y = -((e.clientY - rect.top) / container.clientHeight) * 2 + 1;
 
       raycaster.setFromCamera(mouse, camera);
-
-      const allPlanetMeshes = [
-        ...planetItems.map((p) => p.mesh),
-        ...undiscoveredItems.map((u) => u.mesh),
-      ];
-
-      const intersects = raycaster.intersectObjects(allPlanetMeshes, false);
+      const intersects = raycaster.intersectObjects(clusterMeshes, false);
 
       if (intersects.length > 0) {
         const hitMesh = intersects[0].object;
@@ -442,23 +233,19 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
         if (proj) {
           soundFx.playPulse();
 
-          // Calculate target camera position offset from planet
-          const planetWorldPos = new THREE.Vector3();
-          hitMesh.getWorldPosition(planetWorldPos);
+          const worldPos = new THREE.Vector3();
+          hitMesh.getWorldPosition(worldPos);
 
-          // Fly to position offset from planet
-          targetCamPos.copy(planetWorldPos).add(new THREE.Vector3(0, 2, 5));
-          targetLookAt.copy(planetWorldPos);
+          targetCamPos.copy(worldPos).add(new THREE.Vector3(0, 1, 6));
+          targetLookAt.copy(worldPos);
 
-          // Trigger project modal after brief fly-to camera zoom
           setTimeout(() => {
             onSelectProject(proj);
           }, 350);
         }
       } else {
-        // User clicked blank space — Reset camera & deselect
         soundFx.playClick();
-        targetCamPos.copy(defaultCamPos);
+        targetCamPos.set(0, 0, 24);
         targetLookAt.set(0, 0, 0);
         onSelectProject(null);
       }
@@ -478,67 +265,32 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
     };
     window.addEventListener('resize', onResize);
 
-    // ── Animation Loop ───────────────────────────────────
+    // ── Animation Loop ───────────────────────────────────────
     let rafId: number;
     let t = 0;
 
     const animate = () => {
       rafId = requestAnimationFrame(animate);
-      t += 0.008;
+      t += 0.01;
 
-      // Smooth Camera Fly-To Lerp
+      // Camera lerp
       camera.position.lerp(targetCamPos, 0.08);
       currentLookAt.lerp(targetLookAt, 0.08);
       camera.lookAt(currentLookAt);
 
-      // Orbit for Discovered Planets (multiplied by speedRef.current)
-      planetItems.forEach((item) => {
-        item.orbitAngle += item.cfg.orbitSpeed * speedRef.current;
-        const radius = item.cfg.orbitRadius;
-
-        item.group.position.x = Math.cos(item.orbitAngle) * radius;
-        item.group.position.z = Math.sin(item.orbitAngle) * radius;
-        item.group.position.y = Math.sin(item.orbitAngle * 2) * 0.3;
-
-        // Make planet face the Sun at (0,0,0)
-        item.mesh.lookAt(0, 0, 0);
-
-        // Selection highlight ring & scale
-        const isSelected = selectedRef.current?.id === item.project.id;
-        const ringMat = item.selectionRing.material as THREE.MeshBasicMaterial;
-
+      // Pulse Cluster Nodes
+      clusterMeshes.forEach((mesh, idx) => {
+        mesh.rotation.y += 0.005;
+        const isSelected = selectedRef.current?.id === mesh.userData.project.id;
         if (isSelected) {
-          ringMat.opacity = 0.85 + Math.sin(t * 4) * 0.15;
-          item.group.scale.setScalar(1.25);
+          mesh.scale.setScalar(1.3 + Math.sin(t * 5) * 0.1);
         } else {
-          ringMat.opacity = 0;
-          item.group.scale.setScalar(1.0);
+          mesh.scale.setScalar(1.0 + Math.sin(t * 2 + idx) * 0.05);
         }
       });
 
-      // Orbit for Undiscovered Planets
-      undiscoveredItems.forEach((item) => {
-        item.orbitAngle += item.cfg.orbitSpeed * speedRef.current;
-        const radius = item.cfg.orbitRadius;
-
-        item.group.position.x = Math.cos(item.orbitAngle) * radius;
-        item.group.position.z = Math.sin(item.orbitAngle) * radius;
-        item.group.position.y = Math.sin(item.orbitAngle * 2.2) * 0.3;
-
-        // Make undiscovered planet face the Sun at (0,0,0)
-        item.mesh.lookAt(0, 0, 0);
-
-        const isSelected = selectedRef.current?.id === item.projectMock.id;
-        const ringMat = item.selectionRing.material as THREE.MeshBasicMaterial;
-
-        if (isSelected) {
-          ringMat.opacity = 0.9;
-          item.group.scale.setScalar(1.2);
-        } else {
-          ringMat.opacity = 0.3 + Math.sin(t * 2.5) * 0.15;
-          item.group.scale.setScalar(1.0);
-        }
-      });
+      // Slowly rotate bounding scene box
+      boundingBoxMesh.rotation.y = Math.sin(t * 0.2) * 0.05;
 
       renderer.render(scene, camera);
     };
@@ -559,81 +311,49 @@ export const DataFlow3DCanvas: React.FC<DataFlow3DCanvasProps> = ({
   }, []);
 
   return (
-    <div className="relative w-full h-full bg-[#020617] overflow-hidden select-none">
+    <div className="relative w-full h-full bg-[#030712] overflow-hidden select-none font-mono">
       <div ref={containerRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
 
-      {/* HUD Info & Interactive Shader Controls */}
-      <div className="absolute top-4 left-4 z-10 space-y-2">
-        <div className="bg-slate-950/90 backdrop-blur border border-slate-800 rounded-xl px-4 py-3 text-xs font-mono text-slate-200 shadow-xl">
-          <div className="flex items-center justify-between gap-3 mb-2 pb-1 border-b border-slate-800">
-            <div className="flex items-center gap-2 text-cyan-400 font-bold text-[11px]">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping inline-block" />
-              3D SOLAR SYSTEM VIEWPORT
-            </div>
+      {/* 3D LATENT SPACE MAP HUD Header */}
+      <div className="absolute top-4 left-4 z-10 pointer-events-none">
+        <div className="bg-slate-950/90 backdrop-blur border border-slate-800 rounded-xl px-4 py-3 text-xs text-slate-200 shadow-2xl">
+          <div className="flex items-center gap-2 text-purple-400 font-bold mb-1 text-[11px]">
+            <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping inline-block" />
+            3D LATENT SPACE MAP
           </div>
-
-          {/* Interactive Controls */}
-          <div className="space-y-2 text-[10px] text-slate-300 pt-1">
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-slate-400">Orbit Speed: {speedMult.toFixed(1)}x</span>
-              <input
-                type="range"
-                min="0.2"
-                max="3.0"
-                step="0.2"
-                value={speedMult}
-                onChange={(e) => setSpeedMult(parseFloat(e.target.value))}
-                className="w-24 accent-cyan-400 cursor-pointer"
-              />
-            </div>
-
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-slate-400">Sun Exposure: {exposureVal.toFixed(2)}</span>
-              <input
-                type="range"
-                min="0.8"
-                max="2.5"
-                step="0.1"
-                value={exposureVal}
-                onChange={(e) => setExposureVal(parseFloat(e.target.value))}
-                className="w-24 accent-amber-400 cursor-pointer"
-              />
-            </div>
+          <div className="text-[10px] text-slate-400 space-y-0.5">
+            <div>• Drag to rotate high-dimensional vector space</div>
+            <div>• Click cluster nodes to inspect project deep dive</div>
+            <div>• Inter-cluster neural beams show architecture relations</div>
           </div>
         </div>
       </div>
 
-      {/* Legend */}
+      {/* Cluster Legend */}
       <div className="absolute top-4 right-4 pointer-events-none z-10 hidden sm:flex flex-col gap-1.5">
-        {[
-          { color: '#ff6a00', label: 'DevDash' },
-          { color: '#4fc3f7', label: 'OpenOnyx' },
-          { color: '#daa520', label: 'Keystroke Lab' },
-          { color: '#00e676', label: 'Hopper v2' },
-          { color: '#6366f1', label: '??? Future Builds', pulse: true },
-        ].map((item) => (
+        {CLUSTER_NODES.map((item) => (
           <div
-            key={item.label}
-            className="flex items-center gap-2 bg-slate-950/80 backdrop-blur border border-slate-800 rounded-lg px-3 py-1 text-[10px] font-mono text-slate-300"
+            key={item.id}
+            className="flex items-center gap-2 bg-slate-950/80 backdrop-blur border border-slate-800 rounded-lg px-3 py-1 text-[10px] font-mono text-slate-300 shadow-md"
           >
             <span
-              className={`w-2.5 h-2.5 rounded-full ${item.pulse ? 'animate-pulse' : ''}`}
-              style={{ backgroundColor: item.color }}
+              className="w-2.5 h-2.5 rounded-full animate-pulse"
+              style={{ backgroundColor: `#${item.color.toString(16).padStart(6, '0')}` }}
             />
             {item.label}
           </div>
         ))}
       </div>
 
-      {/* Bottom Status */}
+      {/* Bottom Status Bar */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none z-10">
-        <div className="bg-slate-950/90 backdrop-blur border border-slate-800 rounded-full px-5 py-1.5 text-[10px] font-mono flex items-center gap-3 shadow-lg">
+        <div className="bg-slate-950/90 backdrop-blur border border-slate-800 rounded-full px-5 py-1.5 text-[10px] flex items-center gap-3 shadow-xl">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-          <span className="text-emerald-400">4 DISCOVERED PROJECTS</span>
+          <span className="text-emerald-400">4 ACTIVE LATENT CLUSTERS</span>
           <span className="text-slate-600">|</span>
-          <span className="text-indigo-400">2 FUTURE BUILDS</span>
+          <span className="text-purple-400">NEURAL BEAMS ONLINE</span>
           <span className="text-slate-600">|</span>
-          <span className="text-cyan-400">ORBIT ACTIVE</span>
+          <span className="text-cyan-400">FPS: 60</span>
         </div>
       </div>
     </div>

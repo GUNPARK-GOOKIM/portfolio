@@ -46,8 +46,8 @@ export const projectsData: Project[] = [
       'Git-style transaction cell staging with color-coded diff review prior to commit',
       'Safe Mode Shield preventing accidental DROP, TRUNCATE, or unindexed DELETE queries'
     ],
-    githubUrl: 'https://github.com/GUNPARK-GOOKIM/DevDash',
-    liveDemoUrl: 'https://github.com/GUNPARK-GOOKIM/DevDash/releases/latest',
+    githubUrl: 'https://github.com/akshat-lakhera/DevDash',
+    liveDemoUrl: 'https://github.com/akshat-lakhera/DevDash/releases/latest',
     clusterCoords: { x: -3.2, y: 1.5, z: 0.0 }
   },
   {
@@ -95,8 +95,8 @@ export const projectsData: Project[] = [
       'Interactive D3.js force-directed knowledge graph with clustering and connection filters',
       'Obsidian plugin compatibility runtime layer with bidirectional IndexedDB caching'
     ],
-    githubUrl: 'https://github.com/GUNPARK-GOOKIM/OpenOnyx',
-    liveDemoUrl: 'https://github.com/GUNPARK-GOOKIM/OpenOnyx',
+    githubUrl: 'https://github.com/akshat-lakhera/OpenOnyx',
+    liveDemoUrl: 'https://github.com/akshat-lakhera/OpenOnyx',
     clusterCoords: { x: 3.0, y: -1.2, z: 0.5 }
   },
   {
@@ -144,7 +144,7 @@ export const projectsData: Project[] = [
       'Per-letter error heatmap analysis over QWERTY keyboard layouts for targeted drills',
       'Framework-free core scoring engine with 100% unit test coverage'
     ],
-    githubUrl: 'https://github.com/GUNPARK-GOOKIM/keystroke-lab',
+    githubUrl: 'https://github.com/akshat-lakhera/keystroke-lab',
     liveDemoUrl: 'https://keystroke-lab-psi.vercel.app',
     clusterCoords: { x: -1.8, y: -2.2, z: 2.2 }
   },
@@ -193,8 +193,8 @@ export const projectsData: Project[] = [
       'Peer-to-peer WebRTC video/audio streams with zero server media overhead',
       'Monorepo architecture (Next.js 16 App Router, Fastify 5, Prisma ORM, Zod validation)'
     ],
-    githubUrl: 'https://github.com/GUNPARK-GOOKIM/hopper-v2',
-    liveDemoUrl: 'https://github.com/GUNPARK-GOOKIM/hopper-v2',
+    githubUrl: 'https://github.com/akshat-lakhera/hopper-v2',
+    liveDemoUrl: 'https://github.com/akshat-lakhera/hopper-v2',
     clusterCoords: { x: 2.2, y: 1.8, z: -1.5 }
   }
 ];

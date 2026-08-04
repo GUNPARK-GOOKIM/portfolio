@@ -85,7 +85,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
         <div className="flex items-center gap-2">
           <a
-            href="https://github.com/GUNPARK-GOOKIM"
+            href="https://github.com/akshat-lakhera"
             target="_blank" rel="noreferrer"
             className="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-[11px] font-mono border border-slate-700 transition-all"
           >

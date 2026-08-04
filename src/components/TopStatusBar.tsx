@@ -69,18 +69,18 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
                 ? 'from-rose-400 via-amber-400 to-red-500'
                 : 'from-cyan-400 via-blue-400 to-emerald-400'
             }`}>
-              AKSHAT LAKHERA
+              ML Intelligence Portfolio Dashboard
             </span>
             <span className={`px-1.5 py-0.5 text-[10px] font-mono rounded border ${
               isOverclock
                 ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse'
                 : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'
             }`}>
-              {isOverclock ? 'TURBO MODE' : 'PORTFOLIO OS'}
+              {isOverclock ? 'TURBO MODE' : 'v3.0 ML/Data'}
             </span>
           </div>
           <span className="text-[11px] text-slate-400 hidden sm:inline-block">
-            Interactive 3D Solar System & Systems Workspace
+            Akshat Lakhera // High-Dimensional Vector & Systems Workspace
           </span>
         </div>
       </div>
@@ -91,12 +91,12 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
           onClick={() => { soundFx.playClick(); setActiveTab('viewport'); }}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
             activeTab === 'viewport'
-              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
+              ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
               : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
           }`}
         >
           <Layers className="w-3.5 h-3.5" />
-          <span>3D Solar System</span>
+          <span>3D Latent Space Map</span>
         </button>
 
         <button

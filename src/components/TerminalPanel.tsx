@@ -99,9 +99,9 @@ export const TerminalPanel: React.FC<TerminalPanelProps> = ({
         '  Tools     : MLflow, Docker, Git, Supabase, D3.js, TensorRT',
         '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
         '🔗  LINKS',
-        '  GitHub   : github.com/GUNPARK-GOOKIM',
+        '  GitHub   : github.com/akshat-lakhera',
         '  LinkedIn : linkedin.com/in/gen-z-coder',
-        '  DevDash  : github.com/GUNPARK-GOOKIM/DevDash',
+        '  DevDash  : github.com/akshat-lakhera/DevDash',
         '  Download : /Akshat_Lakhera_Resume.docx'
       );
     } else if (lower === 'ls projects') {
@@ -109,13 +109,13 @@ export const TerminalPanel: React.FC<TerminalPanelProps> = ({
         '📂 [PROJECTS // AKSHAT LAKHERA]',
         '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
         '1. ⚡ DevDash        — Native DB GUI Client (Tauri 2.0 + Rust) [DEPLOYED]',
-        '   github.com/GUNPARK-GOOKIM/DevDash',
+        '   github.com/akshat-lakhera/DevDash',
         '2. 💎 OpenOnyx        — AI Knowledge Workspace (Electron + AI) [DEPLOYED]',
-        '   github.com/GUNPARK-GOOKIM/OpenOnyx',
+        '   github.com/akshat-lakhera/OpenOnyx',
         '3. 🧪 Keystroke Lab   — High-Perf Typing Engine (React + Vite) [LIVE]',
         '   keystroke-lab-psi.vercel.app',
         '4. 🚀 Hopper v2       — Agent Execution Pipeline (Python + CUDA) [CONTRIB]',
-        '   github.com/GUNPARK-GOOKIM/hopper-v2'
+        '   github.com/akshat-lakhera/hopper-v2'
       );
     } else if (lower === 'clear') {
       setHistory([]);

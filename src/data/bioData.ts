@@ -5,7 +5,7 @@ export const bioData = {
   bio: 'Driven Computer Science & AI-ML undergraduate (2024–Present). Passionate about machine learning, data engineering, full-stack software development, and native systems engineering.',
   location: 'India / Remote',
   email: 'akshat.lakhera@example.com',
-  github: 'https://github.com/GUNPARK-GOOKIM',
+  github: 'https://github.com/akshat-lakhera',
   linkedin: 'https://www.linkedin.com/in/gen-z-coder/',
   kaggle: 'https://kaggle.com/akshat',
   resumeUrl: '/Akshat_Lakhera_Resume.docx',
